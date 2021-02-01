@@ -22,9 +22,9 @@ public:
         *( (int*) (tmp + sizeof(int) + num_of_elem * size_of_elem ) )= (int) ( tmp + sizeof(int) + num_of_elem * size_of_elem ) ;
         void* tmp_void = (void*) ( tmp + sizeof(int) );
 
-        mas_of_canary = (int**) realloc(mas_of_canary, (canary_count + 2) * sizeof(int*));
-        mas_of_canary[canary_count] = (int*) tmp;
-        mas_of_canary[canary_count + 1] = (int*) ( tmp + num_of_elem * size_of_elem + sizeof(int) );
+        array_of_canary = (int**) realloc(array_of_canary, (canary_count + 2) * sizeof(int*));
+        array_of_canary[canary_count] = (int*) tmp;
+        array_of_canary[canary_count + 1] = (int*) ( tmp + num_of_elem * size_of_elem + sizeof(int) );
 
         canary_count++;
         canary_count++;
@@ -46,7 +46,7 @@ public:
         void* tmp_void = NULL;
 
 
-        while ( ((((int*) prev_point) - 1)  != mas_of_canary[num_of_prev_canary]) && (num_of_prev_canary < (canary_count - 1) ) )//количество канареек идет с 1 и у нас ищется превая канарейка
+        while ( ((((int*) prev_point) - 1)  != array_of_canary[num_of_prev_canary]) && (num_of_prev_canary < (canary_count - 1) ) )//количество канареек идет с 1 и у нас ищется превая канарейка
         {
             num_of_prev_canary++;
         }
@@ -56,7 +56,7 @@ public:
             return NULL;
         }
 
-        new_line = (char*) realloc(prev_point - sizeof(int), num_of_byte + 2 * sizeof(int));
+        new_line = (char*) realloc( ((int*) prev_point) - 1, num_of_byte + 2 * sizeof(int));
 
         if (new_line == NULL)
         {
@@ -67,8 +67,8 @@ public:
         *( (int*) ( new_line + sizeof(int) + num_of_byte ) )= (int) ( new_line + sizeof(int) + num_of_byte ) ;
 
 
-        mas_of_canary[num_of_prev_canary] = (int*) new_line;
-        mas_of_canary[num_of_prev_canary + 1] = (int*) ( new_line + sizeof(int) + num_of_byte );
+        array_of_canary[num_of_prev_canary] = (int*) new_line;
+        array_of_canary[num_of_prev_canary + 1] = (int*) ( new_line + sizeof(int) + num_of_byte );
         tmp_void = (void*) (new_line + sizeof(int));
 
         return tmp_void;
@@ -85,7 +85,7 @@ public:
 
         if  (  *(((int*) point) - 1) == (int) (((int*) point) - 1) )
         {
-            while ( ( (((int*) point) - 1)  != mas_of_canary[num_of_prev_canary] ) && ( num_of_prev_canary < (canary_count - 1) ) )
+            while ( ( (((int*) point) - 1)  != array_of_canary[num_of_prev_canary] ) && ( num_of_prev_canary < (canary_count - 1) ) )
             {
                 num_of_prev_canary++;
             }
@@ -95,8 +95,8 @@ public:
                 exit(101);
             }
 
-            mas_of_canary[num_of_prev_canary] = NULL;
-            mas_of_canary[num_of_prev_canary + 1] = NULL;
+            array_of_canary[num_of_prev_canary] = NULL;
+            array_of_canary[num_of_prev_canary + 1] = NULL;
 
             free( ((int*) point) - 1 );
         } else
@@ -114,9 +114,9 @@ public:
 
         for (i = 0; i < canary_count; i++)
         {
-            if (mas_of_canary[i] != NULL)
+            if (array_of_canary[i] != NULL)
             {
-                if (*mas_of_canary[i] != (int) mas_of_canary[i])
+                if (*array_of_canary[i] != (int) array_of_canary[i])
                 {
                     num_of_err++;
                     mas_of_err[i] = 1;
@@ -171,7 +171,7 @@ public:
 
         if  (  *(((int*) point) - 1) != (int) (((int*) point) - 1) )
         {
-            while ( ( (((int*) point) - 1)  != mas_of_canary[num_of_prev_canary] ) && ( num_of_prev_canary < (canary_count - 1) ) )
+            while ( ( (((int*) point) - 1)  != array_of_canary[num_of_prev_canary] ) && ( num_of_prev_canary < (canary_count - 1) ) )
             {
                 num_of_prev_canary++;
             }
@@ -197,14 +197,14 @@ public:
         for (i = 0; i < (canary_count / 2); i++)
         {
 
-            if ( mas_of_canary[i * 2] != NULL)
+            if ( array_of_canary[i * 2] != NULL)
             {
-                fprintf(dump_file, "%i) point |%x|:\n", k + 1, (int) (mas_of_canary[i * 2] + 1));
+                fprintf(dump_file, "%i) point |%x|:\n", k + 1, (int) (array_of_canary[i * 2] + 1));
 
-                for (j = 0 ; j < ( (int) mas_of_canary[i * 2 + 1] - (int) (mas_of_canary[i * 2] + 1) ); j++)
+                for (j = 0 ; j < ( (int) array_of_canary[i * 2 + 1] - (int) (array_of_canary[i * 2] + 1) ); j++)
                 {
                     printf("still here j = %i\n", j);
-                    fprintf(dump_file, "[%i] ", *(( (char*) (mas_of_canary[i * 2] + 1) ) + j) );
+                    fprintf(dump_file, "[%i] ", *(( (char*) (array_of_canary[i * 2] + 1) ) + j) );
 
                 }
                 fprintf(dump_file, "end\n");
@@ -215,11 +215,11 @@ public:
     }
 
 private:
-    static int** mas_of_canary;
+    static int** array_of_canary;
     static int canary_count;
 };
 
-int** Memory::mas_of_canary{ NULL };
+int** Memory::array_of_canary{ NULL };
 int Memory::canary_count{ 0 };
 
 void my_memory_dump()
